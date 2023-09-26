@@ -1,235 +1,84 @@
-/*-------------------------------------------------------------------------
-This source file is a part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
-
-
-Copyright (c) 2000-2013 Torus Knot Software Ltd
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE
--------------------------------------------------------------------------*/
-
-//! [starter]
-
-#include <exception>
-#include <iostream>
-
 #include "Ogre.h"
+#include "OgreSceneManager.h"
 #include "OgreApplicationContext.h"
-#include "OgreInput.h"
-#include "OgreRTShaderSystem.h"
-#include "OgreCameraMan.h"
+#include <OgreCamera.h>
+#include <OgreInput.h>
+#include <OgreMath.h>
+#include <OgreNode.h>
+#include <OgrePrerequisites.h>
+#include <OgreQuaternion.h>
+#include <iostream>
+#include "helpers.hpp"
 
-using namespace Ogre;
-using namespace OgreBites;
-
-class TutorialApplication
-        : public ApplicationContext
-        , public InputListener
+class KeyHandler : public OgreBites::InputListener
 {
-public:
-    TutorialApplication();
-    virtual ~TutorialApplication();
-
-    void setup();
-    bool keyPressed(const KeyboardEvent& evt);
+    bool keyPressed(const OgreBites::KeyboardEvent& evt) override
+    {
+        if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
+        {
+            Ogre::Root::getSingleton().queueEndRendering();
+        }
+        return true;
+    }
 };
 
+int main(void) {
+    OgreBites::ApplicationContext ctx("OgreTutorialApp");
+    ctx.initApp();
 
-TutorialApplication::TutorialApplication()
-    : ApplicationContext("OgreTutorialApp")
-{
-}
+    Ogre::Root* root = ctx.getRoot();
+    Ogre::SceneManager* scnMgr = root->createSceneManager();
 
-
-TutorialApplication::~TutorialApplication()
-{
-}
-
-
-void TutorialApplication::setup()
-{
-    // do not forget to call the base first
-    ApplicationContext::setup();
-    addInputListener(this);
-
-    // get a pointer to the already created root
-    Root* root = getRoot();
-    SceneManager* scnMgr = root->createSceneManager();
-
-    // register our scene with the RTSS
-    RTShader::ShaderGenerator* shadergen = RTShader::ShaderGenerator::getSingletonPtr();
+    Ogre::RTShader::ShaderGenerator* shadergen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
     shadergen->addSceneManager(scnMgr);
 
-    // -- tutorial section start --
-    //! [cameracreate]
-    SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-    Camera* cam = scnMgr->createCamera("myCam");
-    //! [cameracreate]
+    Ogre::Light* light = scnMgr->createLight("MainLight");
+    Ogre::SceneNode* lightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
+    lightNode->setPosition(0, 10, 15);
+    lightNode->attachObject(light);
 
-    //! [cameraposition]
-    camNode->setPosition(200, 300, 400);
-    camNode->lookAt(Vector3(0, 0, 0), Node::TransformSpace::TS_WORLD);
-    //! [cameraposition]
+    // also need to tell where we are
+    Ogre::SceneNode* camNode = scnMgr->getRootSceneNode()->createChildSceneNode();
+    camNode->setPosition(8, 8, 8);
+    camNode->lookAt(Ogre::Vector3(-1, -1, -1), Ogre::Node::TS_LOCAL);
+    //camNode->setDirection(Ogre::Vector3(-1, -1, -1));
+    camNode->roll(Ogre::Degree(0));
 
-    //! [cameralaststep]
-    cam->setNearClipDistance(5);
+    Ogre::Vector3 cameraPosition = camNode->getPosition();
+    Ogre::Vector3 directionToTarget = Ogre::Vector3() - cameraPosition;
+    camNode->setFixedYawAxis(true);
+    camNode->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TransformSpace::TS_WORLD);
+
+    auto up = Ogre::Vector3(0,0,0);
+    auto dir = Ogre::Vector3(-1,-1,-1);
+    Ogre::Vector3 right = dir.crossProduct(up);
+    Ogre::Quaternion quat;
+    quat.FromAxes(right, up, dir);
+    //camNode->setOrientation(quat);
+
+
+    // create the camera
+    Ogre::Camera* cam = scnMgr->createCamera("myCam");
+    cam->setNearClipDistance(5); // specific to this sample
+    cam->setAutoAspectRatio(true);
     camNode->attachObject(cam);
-    //! [cameralaststep]
+    //camNode->lookAt(Ogre::Vector3(0,0,0), Ogre::Node::TransformSpace::TS_PARENT, Ogre::Vector3f::NEGATIVE_UNIT_Z);
 
-    //! [addviewport]
-    Viewport* vp = getRenderWindow()->addViewport(cam);
-    //! [addviewport]
+    // and tell it to render into the main window
+    ctx.getRenderWindow()->addViewport(cam);
 
-    //! [viewportback]
-    vp->setBackgroundColour(ColourValue(0, 0, 0));
-    //! [viewportback]
+    // finally something to render
+    Krogre::makeMesh("cube.obj", "cube");
+    Ogre::Entity* ent = scnMgr->createEntity("cube");
+    Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode();
+    node->attachObject(ent);
+    node->setPosition(0,0,0);
 
-    //! [cameraratio]
-    cam->setAspectRatio(Real(vp->getActualWidth()) / Real(vp->getActualHeight()));
-    //! [cameraratio]
+    KeyHandler keyHandler;
+    ctx.addInputListener(&keyHandler);
+ 
+    ctx.getRoot()->startRendering();
+    ctx.closeApp();
 
-    //! [lightingsset]
-    scnMgr->setAmbientLight(ColourValue(0, 0, 0));
-    scnMgr->setShadowTechnique(ShadowTechnique::SHADOWTYPE_STENCIL_ADDITIVE);
-    //! [lightingsset]
-
-    //! [ninja]
-    Entity* ninjaEntity = scnMgr->createEntity("ninja.mesh");
-    ninjaEntity->setCastShadows(true);
-
-    scnMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ninjaEntity);
-    //! [ninja]
-
-    //! [plane]
-    Plane plane(Vector3::UNIT_Y, 0);
-    //! [plane]
-
-    //! [planedefine]
-    MeshManager::getSingleton().createPlane(
-            "ground", RGN_DEFAULT,
-            plane,
-            1500, 1500, 20, 20,
-            true,
-            1, 5, 5,
-            Vector3::UNIT_Z);
-    //! [planedefine]
-
-    //! [planecreate]
-    Entity* groundEntity = scnMgr->createEntity("ground");
-    scnMgr->getRootSceneNode()->createChildSceneNode()->attachObject(groundEntity);
-    //! [planecreate]
-
-    //! [planenoshadow]
-    groundEntity->setCastShadows(false);
-    //! [planenoshadow]
-
-    //! [planesetmat]
-    groundEntity->setMaterialName("Examples/Rockwall");
-    //! [planesetmat]
-
-    //! [spotlight]
-    Light* spotLight = scnMgr->createLight("SpotLight");
-    //! [spotlight]
-
-    //! [spotlightcolor]
-    spotLight->setDiffuseColour(0, 0, 1.0);
-    spotLight->setSpecularColour(0, 0, 1.0);
-    //! [spotlightcolor]
-
-    //! [spotlighttype]
-    spotLight->setType(Light::LT_SPOTLIGHT);
-    //! [spotlighttype]
-
-    //! [spotlightposrot]
-    SceneNode* spotLightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-    spotLightNode->attachObject(spotLight);
-    spotLightNode->setDirection(-1, -1, 0);
-    spotLightNode->setPosition(Vector3(200, 200, 0));
-    //! [spotlightposrot]
-
-    //! [spotlightrange]
-    spotLight->setSpotlightRange(Degree(35), Degree(50));
-    //! [spotlightrange]
-
-    //! [directlight]
-    Light* directionalLight = scnMgr->createLight("DirectionalLight");
-    directionalLight->setType(Light::LT_DIRECTIONAL);
-    //! [directlight]
-
-    //! [directlightcolor]
-    directionalLight->setDiffuseColour(ColourValue(0.4, 0, 0));
-    directionalLight->setSpecularColour(ColourValue(0.4, 0, 0));
-    //! [directlightcolor]
-
-    //! [directlightdir]
-    SceneNode* directionalLightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-    directionalLightNode->attachObject(directionalLight);
-    directionalLightNode->setDirection(Vector3(0, -1, 1));
-    //! [directlightdir]
-
-    //! [pointlight]
-    Light* pointLight = scnMgr->createLight("PointLight");
-    pointLight->setType(Light::LT_POINT);
-    //! [pointlight]
-
-    //! [pointlightcolor]
-    pointLight->setDiffuseColour(0.3, 0.3, 0.3);
-    pointLight->setSpecularColour(0.3, 0.3, 0.3);
-    //! [pointlightcolor]
-
-    //! [pointlightpos]
-    SceneNode* pointLightNode = scnMgr->getRootSceneNode()->createChildSceneNode();
-    pointLightNode->attachObject(pointLight);
-    pointLightNode->setPosition(Vector3(0, 150, 250));
-    //! [pointlightpos]
-    // -- tutorial section end --
+    return 0; 
 }
-
-
-bool TutorialApplication::keyPressed(const KeyboardEvent& evt)
-{
-    if (evt.keysym.sym == SDLK_ESCAPE)
-    {
-        getRoot()->queueEndRendering();
-    }
-    return true;
-}
-
-
-int main(int argc, char **argv)
-{
-    try
-    {
-        TutorialApplication app;
-        app.initApp();
-        app.getRoot()->startRendering();
-        app.closeApp();
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Error occurred during execution: " << e.what() << '\n';
-        return 1;
-    }
-
-    return 0;
-}
-
-//! [starter]
