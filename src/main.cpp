@@ -47,7 +47,7 @@ int main(void) {
     Ogre::Vector3 cameraPosition = camNode->getPosition();
     Ogre::Vector3 directionToTarget = Ogre::Vector3() - cameraPosition;
     camNode->setFixedYawAxis(true);
-    camNode->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TransformSpace::TS_WORLD);
+    camNode->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TransformSpace::TS_WORLD, Ogre::Vector3f(0, 0, -0.5).normalisedCopy());
 
     auto up = Ogre::Vector3(0,0,0);
     auto dir = Ogre::Vector3(-1,-1,-1);
@@ -55,7 +55,6 @@ int main(void) {
     Ogre::Quaternion quat;
     quat.FromAxes(right, up, dir);
     //camNode->setOrientation(quat);
-
 
     // create the camera
     Ogre::Camera* cam = scnMgr->createCamera("myCam");
@@ -68,7 +67,7 @@ int main(void) {
     ctx.getRenderWindow()->addViewport(cam);
 
     // finally something to render
-    Krogre::makeMesh("cube.obj", "cube");
+    Krogre::makeMesh("resources/cube.obj", "cube");
     Ogre::Entity* ent = scnMgr->createEntity("cube");
     Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode();
     node->attachObject(ent);
