@@ -10,6 +10,12 @@
 #include <iostream>
 #include "helpers.hpp"
 
+extern "C" {
+    #include "lua.h"
+    #include "lualib.h"
+    #include "lauxlib.h"
+};
+
 class KeyHandler : public OgreBites::InputListener
 {
     bool keyPressed(const OgreBites::KeyboardEvent& evt) override
@@ -23,6 +29,16 @@ class KeyHandler : public OgreBites::InputListener
 };
 
 int main(void) {
+
+    lua_State *L = luaL_newstate();
+    luaL_openlibs(L);
+
+    // Load and run a Lua script
+    luaL_dostring(L, "print('test')");
+
+    // Close Lua
+    lua_close(L);
+
     OgreBites::ApplicationContext ctx("OgreTutorialApp");
     ctx.initApp();
 
@@ -78,6 +94,7 @@ int main(void) {
  
     ctx.getRoot()->startRendering();
     ctx.closeApp();
+    lua_close(L);
 
     return 0; 
 }

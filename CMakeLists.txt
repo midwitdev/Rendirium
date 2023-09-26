@@ -8,28 +8,13 @@ project(Krogre VERSION 1.0)
 find_package(OGRE REQUIRED COMPONENTS Bites CONFIG)
 find_package(assimp REQUIRED)
 
-set(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/ext/LuaJIT)
-
-execute_process(
-    COMMAND make
-    WORKING_DIRECTORY ${MAKE_DIRECTORY}
-    RESULT_VARIABLE MAKE_RESULT
-)
-
-if(MAKE_RESULT EQUAL 0)
-    message(STATUS "Successfully ran 'make' in ${MAKE_DIRECTORY}")
-else()
-    message(FATAL_ERROR "Error running 'make' in ${MAKE_DIRECTORY}")
-endif()
-
-
 file(GLOB SOURCES "src/*.cpp")
 
 file(COPY "./resources" DESTINATION "${CMAKE_BINARY_DIR}")
 
 # add the source files as usual
-add_executable(Krogre ${SOURCES})
- 
+add_library(Krogre SHARED ${SOURCES})
+
+target_include_directories(Krogre PRIVATE "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src")
 # this also sets the includes and pulls third party dependencies
-add_library(luajit OBJECT "./ext/LuaJIT/src/libluajit.a")
-target_link_libraries(Krogre OgreBites assimp::assimp luajit)
+target_link_libraries(Krogre PRIVATE OgreBites assimp::assimp "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src/libluajit.a")
