@@ -127,7 +127,6 @@ int main(void) {
 
     ctx.getRoot()->startRendering();
     ctx.closeApp();
-    lua_close(L);
 
     return 0;
 }
