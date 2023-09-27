@@ -21,6 +21,7 @@ add_custom_target(copy-resources
 add_custom_target(copy-lua-sources
     COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SOURCES} ${CMAKE_BINARY_DIR})
 
+# target for building luajit
 add_custom_target(luajit
     COMMAND make -j24
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ext/LuaJIT)
@@ -44,8 +45,10 @@ add_custom_target(copy-files
 # add the source files as usual
 add_library(Krogre SHARED ${KROGRE_SOURCES})
 
+# krogre needs the files i guess
 add_dependencies(Krogre copy-files)
 
-target_include_directories(Krogre PRIVATE "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src")
+#target_include_directories(Krogre PRIVATE "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src")
+
 # this also sets the includes and pulls third party dependencies
 target_link_libraries(Krogre PRIVATE OgreBites assimp::assimp)
