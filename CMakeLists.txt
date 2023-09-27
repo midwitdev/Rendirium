@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 include(ExternalProject)
 
+set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
+
 project(Krogre VERSION 1.0)
 
 # The COMPONENTS part checks that OGRE was built the way we need it
