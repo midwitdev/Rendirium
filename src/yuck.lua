@@ -1,4 +1,12 @@
 local ffi = require "ffi"
-local engine = ffi.load "libyuck"
+local engine = ffi.load "./libYuck.so"
 
-engine.printf("%s", "test\n")
+ffi.cdef[[
+    void puts(char*);
+]]
+
+function cs(s)
+    return ffi.new("char[?]", #s+1, s)
+end
+
+engine.puts(cs"test");
