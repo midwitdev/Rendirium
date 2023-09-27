@@ -4,6 +4,7 @@
 #include <OgreCamera.h>
 #include <OgreInput.h>
 #include <OgreMath.h>
+#include <OgreMovableObject.h>
 #include <OgreNode.h>
 #include <OgrePrerequisites.h>
 #include <OgreQuaternion.h>
@@ -28,6 +29,25 @@ class KeyHandler : public OgreBites::InputListener
     }
 };
 
+Ogre::Root* getRoot(OgreBites::ApplicationContext* x) { return x->getRoot(); };
+
+Ogre::Vector3 createVector3(Ogre::Real x, Ogre::Real y, Ogre::Real z)
+{
+    auto v = Ogre::Vector3(x,y,z);
+    return v;
+}
+
+Ogre::Quaternion createQuaternion(Ogre::Real w, Ogre::Real x, Ogre::Real y, Ogre::Real z)
+{
+    auto v = Ogre::Quaternion(w,x,y,z);
+    return v;
+}
+
+void attachObject(Ogre::SceneNode *sn, Ogre::MovableObject *o)
+{
+    sn->attachObject(o);
+}
+
 int main(void) {
 
     lua_State *L = luaL_newstate();
@@ -35,6 +55,8 @@ int main(void) {
 
     // Load and run a Lua script
     luaL_dostring(L, "print('test')");
+
+    std::string x = "test";
 
     // Close Lua
     lua_close(L);
