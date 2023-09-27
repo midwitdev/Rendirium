@@ -9,8 +9,10 @@ find_package(OGRE REQUIRED COMPONENTS Bites CONFIG)
 find_package(assimp REQUIRED)
 
 file(GLOB SOURCES "src/*.cpp")
+file(GLOB LUA_SOURCES "src/*.lua")
 
 file(COPY "./resources" DESTINATION "${CMAKE_BINARY_DIR}")
+file(COPY ${LUA_SOURCES} DESTINATION "${CMAKE_BINARY_DIR}")
 
 # add the source files as usual
 add_library(Krogre SHARED ${SOURCES})

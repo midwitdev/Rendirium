@@ -2,12 +2,14 @@
 #include "OgreSceneManager.h"
 #include "OgreApplicationContext.h"
 #include <OgreCamera.h>
+#include <OgreEntity.h>
 #include <OgreInput.h>
 #include <OgreMath.h>
 #include <OgreMovableObject.h>
 #include <OgreNode.h>
 #include <OgrePrerequisites.h>
 #include <OgreQuaternion.h>
+#include <OgreRenderWindow.h>
 #include <iostream>
 #include "helpers.hpp"
 
@@ -29,6 +31,17 @@ class KeyHandler : public OgreBites::InputListener
     }
 };
 
+KeyHandler createKeyHandler()
+{
+    KeyHandler handler;
+    return handler;
+}
+
+void addInputListener(OgreBites::ApplicationContext *ctx, OgreBites::InputListener *listener)
+{
+    ctx->addInputListener(listener);
+}
+
 Ogre::Root* getRoot(OgreBites::ApplicationContext* x) { return x->getRoot(); };
 
 Ogre::Vector3 createVector3(Ogre::Real x, Ogre::Real y, Ogre::Real z)
@@ -48,6 +61,22 @@ void attachObject(Ogre::SceneNode *sn, Ogre::MovableObject *o)
     sn->attachObject(o);
 }
 
+Ogre::Entity* createEntity(Ogre::SceneManager *sm, std::string& name)
+{
+    return sm->createEntity(name);
+}
+
+std::string makeString(char* a)
+{
+    return std::string(a);
+}
+
+/*
+Ogre::RenderWindow *getRenderWindow(OgreBites::ApplicationContext *ctx)
+{
+    return ctx->getRenderWindow();
+}
+*/
 int main(void) {
 
     lua_State *L = luaL_newstate();

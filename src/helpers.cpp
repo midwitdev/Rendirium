@@ -3,7 +3,7 @@
 
 namespace Krogre {
 
-    void makeMesh(Ogre::String meshFile, Ogre::String meshName)
+    void makeMesh(Ogre::String& meshFile, Ogre::String& meshName)
     {
         Ogre::MeshPtr Mesh = Ogre::MeshManager::getSingleton().createManual(meshName, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         Ogre::SubMesh *subMesh = Mesh->createSubMesh("subMesh");
