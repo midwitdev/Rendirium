@@ -72,18 +72,6 @@ Ogre::RenderWindow *getRenderWindow(OgreBites::ApplicationContext *ctx)
 }
 */
 int main(void) {
-
-    lua_State *L = luaL_newstate();
-    luaL_openlibs(L);
-
-    // Load and run a Lua script
-    luaL_dostring(L, "print('test')");
-
-    std::string x = "test";
-
-    // Close Lua
-    lua_close(L);
-
     OgreBites::ApplicationContext ctx("OgreTutorialApp");
     ctx.initApp();
 
