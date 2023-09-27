@@ -9,23 +9,43 @@ add_subdirectory(ext/ogre3d)
 
 find_package(assimp REQUIRED)
 
-file(GLOB SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
+file(GLOB KROGRE_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 file(GLOB LUA_SOURCES "${CMAKE_SOURCE_DIR}/src/*.lua")
-file(GLOB RESOURCES "${CMAKE_SOURCE_DIR}/resources")
+file(GLOB KROGRE_RESOURCES "${CMAKE_SOURCE_DIR}/resources")
 
-add_custom_target(copy-resources ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RESOURCES} ${CMAKE_BINARY_DIR})
+# target for copying krogre resource files
+add_custom_target(copy-resources
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${KROGRE_RESOURCES} ${CMAKE_BINARY_DIR})
 
-add_custom_target(copy-lua-sources ALL
+# target for copying krogre lua files
+add_custom_target(copy-lua-sources
     COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SOURCES} ${CMAKE_BINARY_DIR})
 
-add_custom_target(copy-files ALL
+add_custom_target(luajit
+    COMMAND make -j24
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ext/LuaJIT)
+
+# target for copying luajit jit dir
+add_custom_target(copy-luajit-jit-dir
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/ext/LuaJIT/src/jit ${CMAKE_BINARY_DIR})
+
+# target for copying luajit
+add_custom_target(copy-luajit
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/ext/LuaJIT/src/luajit ${CMAKE_BINARY_DIR}
+    DEPENDS copy-luajit-jit-dir
+    DEPENDS luajit)
+
+# target for copying all build files
+add_custom_target(copy-files
     DEPENDS copy-resources
-    DEPENDS copy-lua-sources)
+    DEPENDS copy-lua-sources
+    DEPENDS copy-luajit)
 
 # add the source files as usual
-add_library(Krogre SHARED ${SOURCES})
+add_library(Krogre SHARED ${KROGRE_SOURCES})
 
-target_include_directories(Krogre PRIVATE "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src" DEPENDS copy-files)
+add_dependencies(Krogre copy-files)
+
+target_include_directories(Krogre PRIVATE "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src")
 # this also sets the includes and pulls third party dependencies
-target_link_libraries(Krogre PRIVATE OgreBites assimp::assimp "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src/libluajit.a")
+target_link_libraries(Krogre PRIVATE OgreBites assimp::assimp)
