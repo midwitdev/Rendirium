@@ -5,7 +5,8 @@ project(Krogre VERSION 1.0)
 
 # The COMPONENTS part checks that OGRE was built the way we need it
 # The CONFIG flag makes sure we get OGRE instead of OGRE-next
-find_package(OGRE REQUIRED COMPONENTS Bites CONFIG)
+add_subdirectory(ext/ogre3d)
+
 find_package(assimp REQUIRED)
 
 file(GLOB SOURCES "src/*.cpp")
