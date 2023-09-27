@@ -1,6 +1,3 @@
 [submodule "ext/LuaJIT"]
 	path = ext/LuaJIT
 	url = https://github.com/Awesmoe/LuaJIT
-[submodule "ext/ogre3d"]
-	path = ext/ogre3d
-	url = https://github.com/Awesmoe/ogre3d
