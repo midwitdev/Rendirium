@@ -12,13 +12,16 @@ file(GLOB yuck_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp" "${CMAKE_SOURCE_DIR}/src/
 file(GLOB LUA_SOURCES "${CMAKE_SOURCE_DIR}/src/*.lua")
 file(GLOB yuck_RESOURCES "${CMAKE_SOURCE_DIR}/resources")
 
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/scripts)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/jit)
+
 # target for copying yuck resource files
 add_custom_target(copy-resources
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${yuck_RESOURCES} ${CMAKE_BINARY_DIR})
 
 # target for copying yuck lua files
 add_custom_target(copy-lua-sources
-    COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SOURCES} ${CMAKE_BINARY_DIR})
+    COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SOURCES} ${CMAKE_BINARY_DIR}/scripts)
 
 # target for building luajit
 add_custom_target(luajit
@@ -27,7 +30,7 @@ add_custom_target(luajit
 
 # target for copying luajit jit dir
 add_custom_target(copy-luajit-jit-dir
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/ext/LuaJIT/src/jit ${CMAKE_BINARY_DIR})
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/ext/LuaJIT/src/jit ${CMAKE_BINARY_DIR}/jit)
 
 # target for copying luajit
 add_custom_target(copy-luajit
