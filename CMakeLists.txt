@@ -3,20 +3,20 @@ include(ExternalProject)
 
 # set(CMAKE_COMPILE_WARNING_AS_ERROR OFF) # needed for Ogre3d ext build
 
-project(Yuck VERSION 1.0)
+project(yuck VERSION 1.0)
 
 find_package(Vulkan REQUIRED)
 find_package(glfw3 REQUIRED)
 
-file(GLOB Yuck_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp" "${CMAKE_SOURCE_DIR}/src/*.c")
+file(GLOB yuck_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp" "${CMAKE_SOURCE_DIR}/src/*.c")
 file(GLOB LUA_SOURCES "${CMAKE_SOURCE_DIR}/src/*.lua")
-file(GLOB Yuck_RESOURCES "${CMAKE_SOURCE_DIR}/resources")
+file(GLOB yuck_RESOURCES "${CMAKE_SOURCE_DIR}/resources")
 
-# target for copying Yuck resource files
+# target for copying yuck resource files
 add_custom_target(copy-resources
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${Yuck_RESOURCES} ${CMAKE_BINARY_DIR})
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${yuck_RESOURCES} ${CMAKE_BINARY_DIR})
 
-# target for copying Yuck lua files
+# target for copying yuck lua files
 add_custom_target(copy-lua-sources
     COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SOURCES} ${CMAKE_BINARY_DIR})
 
@@ -42,12 +42,12 @@ add_custom_target(copy-files
     DEPENDS copy-luajit)
 
 # add the source files as usual
-add_library(Yuck SHARED ${Yuck_SOURCES})
+add_library(yuck SHARED ${yuck_SOURCES})
 
-# Yuck needs the files i guess
-add_dependencies(Yuck copy-files)
+# yuck needs the files i guess
+add_dependencies(yuck copy-files)
 
-#target_include_directories(Yuck PRIVATE "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src")
+#target_include_directories(yuck PRIVATE "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src")
 
 # this also sets the includes and pulls third party dependencies
-target_link_libraries(Yuck PRIVATE vulkan glfw) 
+target_link_libraries(yuck PRIVATE vulkan glfw) 
