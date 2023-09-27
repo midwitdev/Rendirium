@@ -13,12 +13,6 @@
 #include <iostream>
 #include "helpers.hpp"
 
-extern "C" {
-    #include "lua.h"
-    #include "lualib.h"
-    #include "lauxlib.h"
-};
-
 class KeyHandler : public OgreBites::InputListener
 {
     bool keyPressed(const OgreBites::KeyboardEvent& evt) override
@@ -142,10 +136,10 @@ int main(void) {
 
     KeyHandler keyHandler;
     ctx.addInputListener(&keyHandler);
- 
+
     ctx.getRoot()->startRendering();
     ctx.closeApp();
     lua_close(L);
 
-    return 0; 
+    return 0;
 }
