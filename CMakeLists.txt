@@ -1,22 +1,22 @@
 cmake_minimum_required(VERSION 3.12)
 include(ExternalProject)
 
-set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
+# set(CMAKE_COMPILE_WARNING_AS_ERROR OFF) # needed for Ogre3d ext build
 
-project(Krogre VERSION 1.0)
+project(Yuck VERSION 1.0)
 
 find_package(Vulkan REQUIRED)
 find_package(glfw3 REQUIRED)
 
-file(GLOB KROGRE_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
+file(GLOB Yuck_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp" "${CMAKE_SOURCE_DIR}/src/*.c")
 file(GLOB LUA_SOURCES "${CMAKE_SOURCE_DIR}/src/*.lua")
-file(GLOB KROGRE_RESOURCES "${CMAKE_SOURCE_DIR}/resources")
+file(GLOB Yuck_RESOURCES "${CMAKE_SOURCE_DIR}/resources")
 
-# target for copying krogre resource files
+# target for copying Yuck resource files
 add_custom_target(copy-resources
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${KROGRE_RESOURCES} ${CMAKE_BINARY_DIR})
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${Yuck_RESOURCES} ${CMAKE_BINARY_DIR})
 
-# target for copying krogre lua files
+# target for copying Yuck lua files
 add_custom_target(copy-lua-sources
     COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SOURCES} ${CMAKE_BINARY_DIR})
 
@@ -42,12 +42,12 @@ add_custom_target(copy-files
     DEPENDS copy-luajit)
 
 # add the source files as usual
-add_library(Krogre SHARED ${KROGRE_SOURCES})
+add_library(Yuck SHARED ${Yuck_SOURCES})
 
-# krogre needs the files i guess
-add_dependencies(Krogre copy-files)
+# Yuck needs the files i guess
+add_dependencies(Yuck copy-files)
 
-#target_include_directories(Krogre PRIVATE "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src")
+#target_include_directories(Yuck PRIVATE "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src")
 
 # this also sets the includes and pulls third party dependencies
-target_link_libraries(Krogre PRIVATE Vulkan glfw3) 
+target_link_libraries(Yuck PRIVATE vulkan glfw) 
