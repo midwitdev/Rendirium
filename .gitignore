@@ -35,3 +35,6 @@ build*/
 
 #MacOS
 .DS_Store
+
+#vscode cache
+.cache/
