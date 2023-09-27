@@ -5,11 +5,8 @@ set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 
 project(Krogre VERSION 1.0)
 
-# The COMPONENTS part checks that OGRE was built the way we need it
-# The CONFIG flag makes sure we get OGRE instead of OGRE-next
-add_subdirectory(ext/ogre3d)
-
-find_package(assimp REQUIRED)
+find_package(Vulkan REQUIRED)
+find_package(glfw3 REQUIRED)
 
 file(GLOB KROGRE_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 file(GLOB LUA_SOURCES "${CMAKE_SOURCE_DIR}/src/*.lua")
@@ -53,4 +50,4 @@ add_dependencies(Krogre copy-files)
 #target_include_directories(Krogre PRIVATE "${CMAKE_SOURCE_DIR}/ext/LuaJIT/src")
 
 # this also sets the includes and pulls third party dependencies
-target_link_libraries(Krogre PRIVATE OgreBites assimp::assimp)
+target_link_libraries(Krogre PRIVATE Vulkan glfw3) 
