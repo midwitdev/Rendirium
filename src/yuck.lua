@@ -2,12 +2,14 @@ local ffi = require "ffi"
 local engine = ffi.load "./libyuck.so"
 local yuck = {}
 
+local vulkan1 = require'scripts/vulkan1header'
+
 -- the got dam GLFW3
 ffi.cdef[[
     void puts(char*);
     struct GLFWwindow* glfwCreateWindow(unsigned int width, unsigned int height, char *title, struct GLFWmonitor *monitor, struct GLFWwindow *share);
     void glfwWindowHint(int hint, int value);
-    int glfwWindowShouldClose(struct GLFWwindow* window);
+    bool glfwWindowShouldClose(struct GLFWwindow* window);
     void glfwPollEvents();
     void glfwTerminate();
     void glfwInit();
@@ -40,24 +42,33 @@ function cbool(cbool)
     return cbool == 1
 end
 
-yuck.log = print
-
-print'0'
-engine.glfwInit();
-print'1'
-engine.glfwWindowHint(engine.GLFW_CLIENT_API, engine.GLFW_NO_API);
-print'2'
-engine.glfwWindowHint(engine.GLFW_RESIZABLE, engine.GLFW_FALSE);
-print'3'
-local window = engine.glfwCreateWindow(800, 600, cstr"Test", nil, nil);
-print'4'
-
-while cbool(engine.glfwWindowShouldClose(window)) == false do
-    engine.glfwPollEvents();
+function initWindow()
+    print'0'
+    engine.glfwInit();
+    print'1'
+    engine.glfwWindowHint(engine.GLFW_CLIENT_API, engine.GLFW_NO_API);
+    print'2'
+    engine.glfwWindowHint(engine.GLFW_RESIZABLE, engine.GLFW_FALSE);
+    print'3'
+    local window = engine.glfwCreateWindow(800, 600, cstr"Test", nil, nil);
+    print'4'
+    return window;
 end
 
-print("Terminating window");
-engine.glfwTerminate();
-print'5'
+yuck.log = print
+
+window = initWindow()
+
+local windowLoop = (function()
+    
+    while engine.glfwWindowShouldClose(window) == false do
+        engine.glfwPollEvents();
+    end
+    print("Terminating window");
+    engine.glfwTerminate();
+    print'5'
+end)
+
+windowLoop()
 
 -- return yuck
